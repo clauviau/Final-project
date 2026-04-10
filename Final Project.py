@@ -1,10 +1,14 @@
 import pygame
-
+import random
 
 pygame.init()
 
-screen = pygame.display.set_mode((1200, 800))
+screen_width = 1200
+screen_height = 800
+
+screen = pygame.display.set_mode((screen_width, screen_height))
 clock = pygame.time.Clock()
+
 
 # desk and library images from https://opengameart.org/content/wooden-cupboard-shelf-pcdesk
 # wall image from https://opengameart.org/content/medieval-wall
@@ -12,57 +16,108 @@ clock = pygame.time.Clock()
     #windows :  https://fr.freepik.com/photos-vecteurs-libre/fenetre-arche 
 
  #Level class understood from this video : https://www.youtube.com/watch?v=QZ6f9i_GE4s&list=PL117jAcXfXy5lV5A6gi1FEfjxSeBXD3Sz&index=2
+ #structure of the cloud generation : https://www.youtube.com/watch?v=QZ6f9i_GE4s&list=PL117jAcXfXy5lV5A6gi1FEfjxSeBXD3Sz&index=4 
 
-class Level:
+class Background:
     def __init__(self, screen):
         self.screen = screen
-        self.sky = pygame.image.load('sky1.png').convert_alpha()
-        self.sky = pygame.transform.scale(self.sky, (1200, 800))
-        self.wall = pygame.image.load('bigwall.png').convert_alpha() 
-        self.wall = pygame.transform.scale(self.wall, (1200, 800))
+        self.sky = pygame.image.load('images/sky1.png').convert_alpha()
+        self.sky = pygame.transform.scale(self.sky, (screen_width, screen_height))
         
-        self.desk = pygame.image.load('woodDesk_img.png').convert_alpha()
-        self.desk = pygame.transform.scale(self.desk, (180, 215))
-        self.library = pygame.image.load('library_img.png').convert_alpha()
-        self.library = pygame.transform.scale(self.library, (180, 250))
+        self.wall = pygame.image.load('images/bigwall.png').convert_alpha() 
+        self.wall = pygame.transform.scale(self.wall, (screen_width, screen_height))
         
-    
-    def update(self):
-        pass
+        self.cloud = pygame.image.load('images/clouds_img.png').convert_alpha()
+        self.cloud = pygame.transform.scale(self.cloud, (110, 90))
+        self.clouds = []
+
+        for i in range(4):
+            x = random.randint(0, screen_width)
+            y = random.randint(100,200)
+            speed = random.randint(2,4)
+            self.clouds.append({"x": x, "y":y, "speed":speed})
+     
+
+    def update_cloud(self):
+        for cloud in self.clouds:
+            cloud["x"] += cloud["speed"]
+
+            if cloud["x"] > screen_width:
+                cloud["x"] = -100
+                cloud["y"] = random.randint(0,250)
+                cloud["speed"] = random.randint(1,3)
     
     def draw(self):
         self.screen.blit(self.sky, (0, 0))
+        for cloud in self.clouds:
+            self.screen.blit(self.cloud, (cloud["x"], cloud["y"]))
+
         self.screen.blit(self.wall, (0, 0))
-        
         self.floor = pygame.draw.rect(self.screen,(75, 30, 0), (0, 680, 1200, 120))
-
-        self.screen.blit(self.desk, (800, 500))
-        self.screen.blit(self.library, (550, 440))
-        
-        
-
+    
+ 
     def run(self):
-        self.update()
+        self.update_cloud()
         self.draw()
 
-   
 
-#def room(screen):
+class Buttons:
+    def __init__(self, image, x_pos, y_pos):
+        self.image = image
+        self.x_pos = x_pos
+        self.y_pos = y_pos
+        self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
 
-level = Level(screen)
+    def update(self):
+        screen.blit(self.image, self.rect)
+        
+
+    def checkForInput(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            print("Button Press!")
+    
+    def run(self):
+        self.update()
+
+
+class Games:
+    def __init__(self, screen):
+        self.screen = screen
+        self.screen.fill("black")
+
+
+button_library = pygame.image.load('images/library_img.png').convert_alpha()
+button_library = pygame.transform.scale(button_library, (180, 250))
+
+button_desk = pygame.image.load('images/woodDesk_img.png').convert_alpha()
+button_desk = pygame.transform.scale(button_desk, (180, 215))
+
+background = Background(screen)
+buttons_library = Buttons(button_library, 550, 440)
+buttons_desk = Buttons(button_desk,800, 500)
+
+#self.blit(self.desk, (800, 500))
+#self.screen.blit(self.library, (550, 440))
 
 running = True
 while running:
     for event in pygame.event.get():
-
-
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            buttons_library.checkForInput(pygame.mouse.get_pos())
+            buttons_desk.checkForInput(pygame.mouse.get_pos())
 
-    level.run()
+    background.run()
+    buttons_library.run()
+    buttons_desk.run()
+
+    
+
     pygame.display.flip()
+    pygame.display.update()
     clock.tick(60)   
 
 pygame.quit()
