@@ -1,8 +1,12 @@
 import re
+import turtle
 import random
-import colorama #https://www.youtube.com/watch?v=u51Zjlnui4Y 
-from colorama import Fore, Back, Style #https://pypi.org/project/colorama/ 
+import colorama                                                     #https://www.youtube.com/watch?v=u51Zjlnui4Y 
+from colorama import Fore, Back, Style                              #https://pypi.org/project/colorama/ 
 colorama.init(autoreset = True)
+
+t = turtle.Turtle()
+wn = turtle.Screen()
 
 words = open("wordslist.txt").read()
 
@@ -16,7 +20,7 @@ def word_to_guess():
 def validate():
     valid_word = False
     while not valid_word:
-        player_input = input("What is your guess?")
+        player_input = t.write(input("What is your guess?"))
         player_input = player_input.lower()
         if player_input in word_options:
             valid_word = True
@@ -30,35 +34,35 @@ def compare_answer():
     for _ in range(6):
         player_input = validate()
 
-        correct = []
-        intheword = []
-        wrong = []
+        #correct = []
+        #intheword = []
+        #wrong = []
         
         for i in range(5):
             if player_input[i] == answer[i]:
-                print(Back.GREEN + player_input[i], end="")
+                t.write(player_input[i], "green", end="")
                 correct.append(player_input[i])
             
             elif player_input[i] in answer:
-                print(Back.YELLOW + player_input[i], end="")
+                t.write(player_input[i],"yellow", end="")
                 intheword.append(player_input[i])
         
             elif player_input[i] not in answer:
-                print(player_input[i], end="")
+                t.write(player_input[i], end="")
                 wrong.append(player_input[i])
                 
             elif player_input == answer:
                 print("You win!")
                 return
 
-        if correct != []:
-            print("these letters are in the right place",correct)
-        if intheword != []:
-            print("these letters are in the word, but in the wrong place", intheword)
-        if wrong != []:
-            print("these letters are not in the word", wrong)
+        #if correct != []:
+         #   print("these letters are in the right place",correct)
+        #if intheword != []:
+         #   print("these letters are in the word, but in the wrong place", intheword)
+        #if wrong != []:
+         #   print("these letters are not in the word", wrong)
             
-    return print("the word was:", answer)
+    return t.write("the word was:", answer)
 
 
 #Que faire si la lettre y est deux fois?
@@ -67,5 +71,6 @@ def compare_answer():
 compare_answer()
 
 
+wn.exitonclick()
 
 
