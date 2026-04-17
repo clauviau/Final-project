@@ -1,7 +1,10 @@
 import pygame
 import random
+import time
+
 
 pygame.init()
+
 
 screen_width = 1200
 screen_height = 800
@@ -18,7 +21,7 @@ clock = pygame.time.Clock()
  #Level class understood from this video : https://www.youtube.com/watch?v=QZ6f9i_GE4s&list=PL117jAcXfXy5lV5A6gi1FEfjxSeBXD3Sz&index=2
  #structure of the cloud generation : https://www.youtube.com/watch?v=QZ6f9i_GE4s&list=PL117jAcXfXy5lV5A6gi1FEfjxSeBXD3Sz&index=4 
 
-class Background:
+class Background():
     def __init__(self, screen):
         self.screen = screen
         self.sky = pygame.image.load('images/sky1.png').convert_alpha()
@@ -26,7 +29,13 @@ class Background:
         
         self.wall = pygame.image.load('images/bigwall.png').convert_alpha() 
         self.wall = pygame.transform.scale(self.wall, (screen_width, screen_height))
-        
+
+        #self.desk = pygame.image.load('images/woodDesk_img.png').convert_alpha()
+        #self.desk = pygame.transform.scale(self.desk, (180, 215))
+
+        self.door = pygame.image.load('images/closeddoor_img.png').convert_alpha()
+        self.door = pygame.transform.scale(self.door, (180, 300))
+
         self.cloud = pygame.image.load('images/clouds_img.png').convert_alpha()
         self.cloud = pygame.transform.scale(self.cloud, (110, 90))
         self.clouds = []
@@ -54,36 +63,53 @@ class Background:
 
         self.screen.blit(self.wall, (0, 0))
         self.floor = pygame.draw.rect(self.screen,(75, 30, 0), (0, 680, 1200, 120))
-    
+        #self.screen.blit(self.desk, (800, 500))
+        self.screen.blit(self.door, (100, 390))
  
     def run(self):
         self.update_cloud()
         self.draw()
 
+def get_font(size):
+    return pygame.font.Font("FreeSansBold.otf", size)
 
-class Buttons:
-    def __init__(self, image, x_pos, y_pos):
+class Buttons():
+    def __init__(self, image, x_pos, y_pos, size_hover, hover_pos):
         self.image = image
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
 
+        self.hover_image = pygame.image.load("images/white.png").convert_alpha()
+        self.hover_image = pygame.transform.scale(self.hover_image, size_hover)
+        self.hover_pos_x = hover_pos[0]
+        self.hover_pos_y = hover_pos[1]
+        
+        self.hover_image_rect = self.hover_image.get_rect(topleft=(self.hover_pos_x, self.hover_pos_y))
+
     def update(self):
         screen.blit(self.image, self.rect)
-        
 
-    def checkForInput(self, position):
+    def checkForInput_library(self, position):
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
-            print("Button Press!")
-    
+            import Guidedwordle
+
+    def checkForInput_desk(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            return True
+            #self.text = get_font(50).render(self.text, True, 'black')
+            #self.text_rect = self.text.get_rect(center=(600, 400))
+            #screen.blit(self.text, self.text_rect)
+            
+            
+    def change_color(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            screen.blit(self.hover_image, self.hover_image_rect)
+            screen.blit(self.image, self.rect)
+            
     def run(self):
         self.update()
 
-
-class Games:
-    def __init__(self, screen):
-        self.screen = screen
-        self.screen.fill("black")
 
 
 button_library = pygame.image.load('images/library_img.png').convert_alpha()
@@ -92,35 +118,46 @@ button_library = pygame.transform.scale(button_library, (180, 250))
 button_desk = pygame.image.load('images/woodDesk_img.png').convert_alpha()
 button_desk = pygame.transform.scale(button_desk, (180, 215))
 
+
 background = Background(screen)
-buttons_library = Buttons(button_library, 550, 440)
-buttons_desk = Buttons(button_desk,800, 500)
+buttons_library = Buttons(button_library, 550, 440, (195, 260),(542, 435))
+buttons_desk = Buttons(button_desk,800, 500, (190, 225), (795, 495))
 
 #self.blit(self.desk, (800, 500))
 #self.screen.blit(self.library, (550, 440))
 
+message = ""
 running = True
 while running:
+    mouse_pos = pygame.mouse.get_pos()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            buttons_library.checkForInput(pygame.mouse.get_pos())
-            buttons_desk.checkForInput(pygame.mouse.get_pos())
-
+            buttons_library.checkForInput_library(mouse_pos)
+            if buttons_desk.checkForInput_desk(mouse_pos):
+                message = "Not available at this time!"
+            
     background.run()
     buttons_library.run()
     buttons_desk.run()
+    buttons_library.change_color(mouse_pos)
+    buttons_desk.change_color(mouse_pos)
 
-    
+    if message != "":
+        message_time = pygame.time.get_ticks()
+        if message_time < 4000:
+            text_surface = get_font(50).render(message, True, "red")
+            text_rect = text_surface.get_rect(center=(600, 400))
+            screen.blit(text_surface, text_rect)
+        else:
+            message = ""
+
 
     pygame.display.flip()
-    pygame.display.update()
     clock.tick(60)   
 
 pygame.quit()
-
-
-#screen.fill("black") allow to cover previous windows
