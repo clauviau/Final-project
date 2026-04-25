@@ -7,7 +7,7 @@ screen_width = 1200
 screen_height = 800
 
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Menu")
+pygame.display.set_caption("Locked IN")
 
 background = pygame.image.load("images/blue_background_img.png").convert()   #https://pixabay.com/fr/illustrations/conception-courbes-bleu-contexte-2207760/
 background = pygame.transform.scale(background, (1200, 800))
@@ -51,13 +51,22 @@ class Buttons(): #https://github.com/baraltech/Menu-System-PyGame/blob/main/butt
 def options():
     while True:
          options_mouse_pos = pygame.mouse.get_pos()
-         screen.fill('white')
+         screen.fill('black')
          
-         options_text = get_font(45).render("This is the OPTIONS screen", True, 'black')
-         options_rect = options_text.get_rect(center=(600, 200))
+         options_text = get_font(45).render("This is the OPTIONS screen", True, 'white')
+         options_rect = options_text.get_rect(center=(600, 100))
          screen.blit(options_text, options_rect)
 
-         options_back = Buttons(image=None,pos=(600, 460), text_input="BACK", font=get_font(75), base_color="Black", hovering_color="red")
+         options_game = pygame.image.load("images/bigwall.png").convert()
+         options_game = pygame.transform.scale(options_game, (200, 100))
+         options_game_rect = options_game.get_rect(topleft=(100, 200))
+         screen.blit(options_game, options_game_rect)
+
+         options_gameButton = Buttons(image=None, pos=(200,325), text_input="Room 1", font=get_font(25), base_color='white', hovering_color="blue")
+         options_gameButton.changeColor(options_mouse_pos)
+         options_gameButton.update()
+
+         options_back = Buttons(image=None,pos=(600, 560), text_input="BACK", font=get_font(75), base_color="white", hovering_color="red")
          options_back.changeColor(options_mouse_pos)
          options_back.update()
          
@@ -68,6 +77,8 @@ def options():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if options_back.checkForInput(options_mouse_pos):
                     main_menu()
+                elif options_gameButton.checkForInput(options_mouse_pos):
+                    import FinalProject
 
             pygame.display.update()
         
@@ -76,8 +87,8 @@ def main_menu():
     while True:
         screen.blit(background, (0,0))
         menu_mouse_pos = pygame.mouse.get_pos()
-        menu_text = get_font(100).render("MAIN MENU", True, 'white')
-        menu_rect = menu_text.get_rect(center=(640, 150))
+        menu_text = get_font(100).render("LOCKED IN", True, 'white')
+        menu_rect = menu_text.get_rect(center=(625, 150))
 
         play_button = Buttons(image=None, pos=(600, 350), text_input="PLAY", font=get_font(75), base_color = 'white', hovering_color = "#ADD8E6")
         options_button = Buttons(image=None, pos=(600, 450), text_input="OPTIONS", font=get_font(75), base_color = 'white', hovering_color = "blue")
@@ -106,7 +117,6 @@ def main_menu():
 
 
 main_menu()
-
 
 
 
