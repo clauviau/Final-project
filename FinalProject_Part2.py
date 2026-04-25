@@ -31,6 +31,9 @@ class Background():
 
         self.library = pygame.image.load('images/library_img.png').convert_alpha()
         self.library = pygame.transform.scale(self.library, (180, 250))
+
+        self.door = pygame.image.load('images/closeddoor_img.png').convert_alpha()
+        self.door = pygame.transform.scale(self.door, (180, 300))
         
         self.cloud = pygame.image.load('images/clouds_img.png').convert_alpha()
         self.cloud = pygame.transform.scale(self.cloud, (110, 90))
@@ -41,7 +44,6 @@ class Background():
             y = random.randint(100,200)
             speed = random.randint(2,4)
             self.clouds.append({"x": x, "y":y, "speed":speed})
-     
 
     def update_cloud(self):
         for cloud in self.clouds:
@@ -60,19 +62,28 @@ class Background():
         self.screen.blit(self.wall, (0, 0))
         self.screen.blit(self.library, (550, 440))
         self.floor = pygame.draw.rect(self.screen,(75, 30, 0), (0, 680, 1200, 120))
-    
+        self.screen.blit(self.door, (100, 390))
  
     def run(self):
         self.update_cloud()
         self.draw()
 
+def get_font(size):
+    return pygame.font.Font("FreeSansBold.otf", size)
 
 class Buttons():
-    def __init__(self, image, x_pos, y_pos):
+    def __init__(self, image, x_pos, y_pos, size_hover, hover_pos):
         self.image = image
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.rect = self.image.get_rect(topleft=(self.x_pos, self.y_pos))
+
+        self.hover_image = pygame.image.load("images/white.png").convert_alpha()
+        self.hover_image = pygame.transform.scale(self.hover_image, size_hover)
+        self.hover_pos_x = hover_pos[0]
+        self.hover_pos_y = hover_pos[1]
+        
+        self.hover_image_rect = self.hover_image.get_rect(topleft=(self.hover_pos_x, self.hover_pos_y))
 
     def update(self):
         screen.blit(self.image, self.rect)
@@ -81,10 +92,18 @@ class Buttons():
         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
             import PEMDAS
 
+    def checkForInput_door(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            return True
+
+
+    def change_color(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            screen.blit(self.hover_image, self.hover_image_rect)
+            screen.blit(self.image, self.rect)
+
     def run(self):
         self.update()
-
-
 
 
 
@@ -94,28 +113,53 @@ button_library = pygame.transform.scale(button_library, (180, 250))
 button_desk = pygame.image.load('images/woodDesk_img.png').convert_alpha()
 button_desk = pygame.transform.scale(button_desk, (180, 215))
 
-background = Background(screen)
-#buttons_library = Buttons(button_library, 550, 440)
-buttons_desk = Buttons(button_desk,800, 500)
+button_door = pygame.image.load('images/closeddoor_img.png').convert_alpha()
+button_door = pygame.transform.scale(button_door, (180, 300))
 
-#self.blit(self.desk, (800, 500))
-#self.screen.blit(self.library, (550, 440))
+background = Background(screen)
+buttons_library = Buttons(button_library, 550, 440, (195, 260),(542, 435))
+buttons_desk = Buttons(button_desk,800, 500, (190, 225), (795, 495))
+buttons_door = Buttons(button_door, 100, 390, (190, 315), (95, 380))
+
+show_message = False
+message_start_time = 0
+
+def not_available():
+    current_time = pygame.time.get_ticks()
+    message = "Not available at this time!"
+
+    if show_message and current_time - message_start_time < 4000:
+        text_surface = get_font(50).render(message, True, "red")
+        text_rect = text_surface.get_rect(center=(600, 400))
+        screen.blit(text_surface, text_rect)
 
 running = True
 while running:
+    mouse_pos = pygame.mouse.get_pos()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            buttons_desk.checkForInput_desk(pygame.mouse.get_pos())
+            buttons_desk.checkForInput_desk(mouse_pos)
+            if buttons_door.checkForInput_door(mouse_pos):
+                show_message = True
+                message_start_time = pygame.time.get_ticks()
 
     background.run()
-    #buttons_library.run()
+    buttons_library.run()
     buttons_desk.run()
+    buttons_door.run()
+    buttons_desk.change_color(mouse_pos)
+    buttons_door.change_color(mouse_pos)
 
     
+    not_available()
+    current_time = pygame.time.get_ticks()
+    if show_message and current_time - message_start_time >= 2000:
+        show_message = False
 
     pygame.display.flip()
     pygame.display.update()
@@ -123,5 +167,3 @@ while running:
 
 pygame.quit()
 
-
-#screen.fill("black") allow to cover previous windows
