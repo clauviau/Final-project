@@ -47,7 +47,6 @@ class Buttons(): #https://github.com/baraltech/Menu-System-PyGame/blob/main/butt
          else:
             self.text = self.font.render(self.text_input, True, self.base_color)
 
-
 def options():
     while True:
          options_mouse_pos = pygame.mouse.get_pos()
@@ -82,7 +81,6 @@ def options():
 
             pygame.display.update()
         
-
 def main_menu():
     while True:
         screen.blit(background, (0,0))
@@ -114,7 +112,6 @@ def main_menu():
                     sys.exit()
 
         pygame.display.update()
-
 
 main_menu()
 
