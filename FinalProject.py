@@ -22,6 +22,9 @@ class Background():
         self.wall = pygame.image.load('images/bigwall.png').convert_alpha() 
         self.wall = pygame.transform.scale(self.wall, (screen_width, screen_height))
 
+        self.photo = pygame.image.load('images/photo_img.png').convert_alpha()
+        self.photo = pygame.transform.scale(self.photo, (215, 270))
+
         self.cloud = pygame.image.load('images/clouds_img.png').convert_alpha()
         self.cloud = pygame.transform.scale(self.cloud, (110, 90))
         self.clouds = []
@@ -47,8 +50,9 @@ class Background():
             self.screen.blit(self.cloud, (cloud["x"], cloud["y"]))
 
         self.screen.blit(self.wall, (0, 0))
+        self.screen.blit(self.photo, (150, 50))
         self.floor = pygame.draw.rect(self.screen,(75, 30, 0), (0, 680, 1200, 120))
- 
+        
     def run(self):
         self.update_cloud()
         self.draw()
@@ -90,9 +94,8 @@ class Buttons():
     def run(self):
         self.update()
 
-
 button_library = pygame.image.load('images/library_img.png').convert_alpha()
-button_library = pygame.transform.scale(button_library, (180, 250))
+button_library = pygame.transform.scale(button_library, (195, 320))
 
 button_desk = pygame.image.load('images/woodDesk_img.png').convert_alpha()
 button_desk = pygame.transform.scale(button_desk, (180, 215))
@@ -100,11 +103,13 @@ button_desk = pygame.transform.scale(button_desk, (180, 215))
 button_door = pygame.image.load('images/closeddoor_img.png').convert_alpha()
 button_door = pygame.transform.scale(button_door, (180, 300))
 
+computer = pygame.image.load('images/computer_img.png').convert_alpha()
+computer = pygame.transform.scale(computer, (95, 75))
+
 background = Background(screen)
-buttons_library = Buttons(button_library, 550, 440, (195, 260),(542, 435))
+buttons_library = Buttons(button_library, 550, 380, (215, 330),(542, 375))
 buttons_desk = Buttons(button_desk,800, 500, (190, 225), (795, 495))
 buttons_door = Buttons(button_door, 100, 390, (190, 315), (95, 380))
-
 
 show_message = False
 message_start_time = 0
@@ -117,9 +122,7 @@ def not_available():
             text_surface = get_font(50).render(message, True, "red")
             text_rect = text_surface.get_rect(center=(600, 400))
             screen.blit(text_surface, text_rect)
- 
     
-
 running = True
 while running:
     mouse_pos = pygame.mouse.get_pos()
@@ -144,6 +147,8 @@ while running:
     buttons_door.run()
     buttons_library.change_color(mouse_pos)
     buttons_desk.change_color(mouse_pos)
+    screen.blit(computer, (850, 445))
+ 
     buttons_door.change_color(mouse_pos)
 
     not_available()
@@ -158,11 +163,6 @@ while running:
 pygame.quit()
 
 
-
-
-
-
-
 # desk and library images from https://opengameart.org/content/wooden-cupboard-shelf-pcdesk
 # wall image from https://opengameart.org/content/medieval-wall
     #used GIMP to make wall_img.png bigger, by creating a canvas the size of the screen and ctr+c/ctr+v the initial image
@@ -170,3 +170,5 @@ pygame.quit()
 
  #Level class understood from this video : https://www.youtube.com/watch?v=QZ6f9i_GE4s&list=PL117jAcXfXy5lV5A6gi1FEfjxSeBXD3Sz&index=2
  #structure of the cloud generation : https://www.youtube.com/watch?v=QZ6f9i_GE4s&list=PL117jAcXfXy5lV5A6gi1FEfjxSeBXD3Sz&index=4 
+ #picture frame from:https://fr.freepik.com/psd-gratuit/cadre-or-orne-element-decoration-classique_409092838.htm#fromView=keyword&page=1&position=0&uuid=3ba5b20a-2173-4527-a37a-ac881c94990d&query=Cadre
+ #picture in the frame I took myself
